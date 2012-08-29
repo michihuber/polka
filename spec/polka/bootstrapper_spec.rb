@@ -36,5 +36,16 @@ describe Polka::Bootstrapper do
       end
     end
   end
+
+  describe "#setup" do
+    it "adds the symlinks" do
+      bs.symlink(:all_other_files)
+      bs.exclude('.norc')
+      dir = double(entries: %w(. .. .norc .testrc))
+      Dir.stub(:new) { dir }
+      FileUtils.should_receive(:ln_s).with("home/.polka/.testrc", "home/.testrc")
+      bs.setup
+    end
+  end
 end
 

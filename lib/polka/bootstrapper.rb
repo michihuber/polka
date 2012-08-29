@@ -23,9 +23,23 @@ module Polka
       @excluded = add_to_group(@excluded, files)
     end
 
+    def setup
+      if @symlinks.include?(:all_other_files)
+        all_files = Dir.new(@dotfile_dir).entries
+        other_files = all_files - %w(.. .) - @excluded
+        @symlinks = other_files
+      end
+      @symlinks.each { |fn| FileUtils.ln_s(dotfile_path(fn),
+                                           home_path(fn)) }
+    end
+
     private
     def dotfile_path(filename)
       File.join(@dotfile_dir, filename)
+    end
+
+    def home_path(filename)
+      File.join(@home_dir, filename)
     end
 
     def add_to_group(group, files)
