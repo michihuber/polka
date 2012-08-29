@@ -5,7 +5,7 @@ module Polka
       @home_dir = home_dir
       @dotfile_dir = dotfile_dir
       @symlinks = []
-      @excluded = []
+      @excluded = ["Dotfile"]
     end
 
     def self.from_dotfile(dotfile, home_dir)
@@ -24,13 +24,10 @@ module Polka
     end
 
     def setup
-      if @symlinks.include?(:all_other_files)
-        all_files = Dir.new(@dotfile_dir).entries
-        other_files = all_files - %w(.. .) - @excluded
-        @symlinks = other_files
-      end
-      @symlinks.each { |fn| FileUtils.ln_s(dotfile_path(fn),
-                                           home_path(fn)) }
+      add_all_other_files
+      syms = @symlinks - @excluded
+      syms.each { |fn| FileUtils.ln_s(dotfile_path(fn),
+                                      home_path(fn)) }
     end
 
     private
@@ -40,6 +37,13 @@ module Polka
 
     def home_path(filename)
       File.join(@home_dir, filename)
+    end
+
+    def add_all_other_files
+      return unless @symlinks.include?(:all_other_files)
+      all_files = Dir.new(@dotfile_dir).entries
+      other_files = all_files - %w(.. .)
+      @symlinks = other_files
     end
 
     def add_to_group(group, files)

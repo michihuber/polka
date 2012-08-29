@@ -6,8 +6,7 @@ describe Polka::Bootstrapper do
   describe "#symlink" do
     it "adds the files to the symlink setup group" do
       bs.symlink('.testrc', '.anotherrc')
-      bs.symlinks.should == ['.testrc',
-                             '.anotherrc']
+      bs.symlinks.should == ['.testrc', '.anotherrc']
     end
 
     context ":all_other_files" do
@@ -21,10 +20,12 @@ describe Polka::Bootstrapper do
   end
 
   describe "#exclude" do
+    it "ignores the Dotfile by default" do
+      bs.excluded.should == ['Dotfile']
+    end
     it "adds the files to the symlink setup group" do
       bs.exclude('.testrc', '.anotherrc')
-      bs.excluded.should == ['.testrc',
-                             '.anotherrc']
+      bs.excluded.should == ['Dotfile', '.testrc', '.anotherrc']
     end
 
     context ":all_other_files" do
