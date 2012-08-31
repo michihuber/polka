@@ -43,6 +43,6 @@ class DotfileGroup
   end
 
   def setup
-    files.each { |f| f.setup(&@operation) }
+    files.each { |f| f.setup(@operation) }
   end
 end

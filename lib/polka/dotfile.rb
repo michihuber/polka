@@ -7,9 +7,9 @@ class Dotfile
     @home_path = home_path
   end
 
-  def setup
+  def setup(operation)
     backup if File.exists?(@home_path)
-    yield @path, @home_path
+    operation.call(@path, @home_path)
   end
 
   def backup

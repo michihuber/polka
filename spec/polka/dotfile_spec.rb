@@ -19,7 +19,7 @@ describe Dotfile do
     it "yields to a given operation" do
       FileUtils.touch(dotfile_path('.testrc'))
       df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
-      df.setup { |dest, src| FileUtils.ln_s(dest, src) }
+      df.setup(lambda { |dest, src| FileUtils.ln_s(dest, src) })
       Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .testrc)
     end
 
@@ -30,7 +30,7 @@ describe Dotfile do
         FileUtils.touch(dotfile_path('.testrc'))
         df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
         Polka.stub(:log)
-        df.setup { |a, b| FileUtils.cp(a, b) }
+        df.setup(lambda { |a, b| FileUtils.cp(a, b) })
         Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .polka_backup .testrc)
         Dir.new(File.join(home_dir, '.polka_backup')).entries.should == %w(. .. 2222-02-02_02:22:22)
       end
