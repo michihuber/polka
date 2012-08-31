@@ -26,8 +26,7 @@ module Polka
     def setup
       @symlinks = files_in_dotfile_dir if @symlinks.include?(:all_other_files)
       syms = @symlinks - @excluded
-      syms.each { |fn| FileUtils.ln_s(dotfile_path(fn),
-                                      home_path(fn)) }
+      syms.each(&:setup)
     end
 
     private
@@ -40,15 +39,20 @@ module Polka
     end
 
     def files_in_dotfile_dir
-      Dir.new(@dotfile_dir).entries - %w(.. .)
+      files = Dir.new(@dotfile_dir).entries - %w(.. .)
+      make_dotfiles(files)
     end
 
     def add_to_group(group, files)
       if files.include?(:all_other_files) || group.include?(:all_other_files)
         [:all_other_files]
       else
-        group + files
+        group + make_dotfiles(files)
       end
+    end
+
+    def make_dotfiles(files)
+      files.map { |fn| Dotfile.new(dotfile_path(fn), home_path(fn)) }
     end
   end
 end
