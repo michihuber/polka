@@ -39,6 +39,13 @@ describe Polka::Bootstrapper do
       excluded_group.should_receive(:add).with([hello_dotfile])
       bs.exclude "hello"
     end
+
+    it "adds file with home_dir_path if specified" do
+      alias_dotfile = double(:alias_dotfile)
+      Dotfile.should_receive(:new).with("home/.polka/.testrc", "home/.onerc").and_return(alias_dotfile)
+      symlink_group.should_receive(:add).with([alias_dotfile])
+      bs.symlink(".testrc", as: ".onerc")
+    end
   end
 end
 

@@ -18,7 +18,12 @@ module Polka
     end
 
     def symlink(*files)
-      add_files_to_group(files, @symlinks)
+      if files.size == 2 && files.last.class == Hash && files.last[:as]
+        df = create_dotfile(files[0], files[1][:as])
+        add_dotfile_to_group(df, @symlinks)
+      else
+        add_files_to_group(files, @symlinks)
+      end
     end
 
     def exclude(*files)
@@ -33,7 +38,11 @@ module Polka
     def add_files_to_group(files, group)
       group.add_all_other_files if files.delete(:all_other_files)
       dotfiles = files.map { |fn| create_dotfile(fn) }
-      group.add(dotfiles)
+      dotfiles.each { |df| add_dotfile_to_group(df, group) }
+    end
+
+    def add_dotfile_to_group(dotfile, group)
+      group.add([dotfile])
     end
 
     def dotfiles_in_dotfile_dir
@@ -41,9 +50,9 @@ module Polka
       files.map { |fn| create_dotfile(fn) }
     end
 
-    def create_dotfile(filename)
+    def create_dotfile(filename, homename=nil)
       dotfile_path = File.join(@dotfile_dir, filename)
-      home_path = File.join(@home_dir, filename)
+      home_path = File.join(@home_dir, homename || filename)
       Dotfile.new(dotfile_path, home_path)
     end
   end
