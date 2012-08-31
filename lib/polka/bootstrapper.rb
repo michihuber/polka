@@ -5,8 +5,13 @@ module Polka
       @dotfile_dir = dotfile_dir
       DotfileGroup.all_files = dotfiles_in_dotfile_dir
 
-      @symlinks = DotfileGroup.new
-      @excluded = DotfileGroup.new
+      symlinking = lambda { |dest, src| FileUtils.ln_s(dest, src) }
+      copying = lambda { |dest, src| FileUtils.cp(dest, src) }
+
+      @symlink = DotfileGroup.new(symlinking)
+      @copy = DotfileGroup.new(copying)
+      @inclusive_groups = [@symlink, @copy]
+      @exclude = DotfileGroup.new
       exclude("Dotfile")
     end
 
@@ -17,32 +22,26 @@ module Polka
       return bootstrapper
     end
 
-    def symlink(*files)
-      if files.size == 2 && files.last.class == Hash && files.last[:as]
-        df = create_dotfile(files[0], files[1][:as])
-        add_dotfile_to_group(df, @symlinks)
-      else
-        add_files_to_group(files, @symlinks)
+    [:symlink, :copy, :exclude].each do |var|
+      define_method(var) do |*files|
+        add_files_to_group(files, instance_variable_get("@#{var}"))
       end
     end
 
-    def exclude(*files)
-      add_files_to_group(files, @excluded)
-    end
-
     def setup
-      @symlinks.setup
+      @inclusive_groups.each(&:setup)
     end
 
     private
     def add_files_to_group(files, group)
-      group.add_all_other_files if files.delete(:all_other_files)
-      dotfiles = files.map { |fn| create_dotfile(fn) }
-      dotfiles.each { |df| add_dotfile_to_group(df, group) }
-    end
+      dotfiles =  if files.size == 2 && files.last.class == Hash && files.last[:as]
+                    [create_dotfile(files[0], files[1][:as])]
+                  else
+                    group.add_all_other_files if files.delete(:all_other_files)
+                    files.map { |fn| create_dotfile(fn) }
+                  end
 
-    def add_dotfile_to_group(dotfile, group)
-      group.add([dotfile])
+      group.add(dotfiles) unless dotfiles.empty?
     end
 
     def dotfiles_in_dotfile_dir

@@ -4,14 +4,18 @@ describe "polka", :integrated_with_files do
   set_up_testdirs
 
   it "provides a DSL to manage your dotfile setup" do
-    setup_dotfiles %w(.onerc .tworc .threerc .nodotfile)
+    setup_dotfiles %w(.onerc .tworc .threerc .nodotfile copyrc)
     setup_the_dotfile <<-EOF
       symlink :all_other_files
       symlink ".onerc", ".tworc"
+      copy "copyrc"
       exclude ".nodotfile"
     EOF
     Cli.new.setup(home_dir, dotfile_dir)
-    Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .onerc .tworc .threerc).sort
+    dir_entries = Dir.new(home_dir).entries
+    dir_entries.should == %w(. .. .dotfile_dir .onerc .threerc .tworc copyrc)
+    File.symlink?(File.join(home_dir, '.onerc')).should == true
+    File.symlink?(File.join(home_dir, 'copyrc')).should == false
   end
 
   it "backs up existing files in your homedir" do

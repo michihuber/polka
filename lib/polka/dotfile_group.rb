@@ -16,7 +16,8 @@ class DotfileGroup
     @@all_files - @@grouped_files
   end
 
-  def initialize
+  def initialize(operation=nil)
+    @operation = operation
     @files = []
     @all_other_files = false
   end
@@ -42,6 +43,6 @@ class DotfileGroup
   end
 
   def setup
-    files.each(&:setup)
+    files.each { |f| f.setup(&@operation) }
   end
 end

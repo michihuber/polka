@@ -9,7 +9,7 @@ class Dotfile
 
   def setup
     backup if File.exists?(@home_path)
-    FileUtils.ln_s(@path, @home_path)
+    yield @path, @home_path
   end
 
   def backup

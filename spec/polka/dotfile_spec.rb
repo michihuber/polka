@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe Dotfile do
-
   describe "#setup", :integrated_with_files do
     set_up_testdirs
 
@@ -17,10 +16,10 @@ describe Dotfile do
       expect { Dotfile.new(dotfile_path('.testrc'), "irrelevant") }.to raise_error(FileNotPresentError)
     end
 
-    it "creates a symlink to itself in the home dir" do
+    it "yields to a given operation" do
       FileUtils.touch(dotfile_path('.testrc'))
       df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
-      df.setup
+      df.setup { |dest, src| FileUtils.ln_s(dest, src) }
       Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .testrc)
     end
 
@@ -31,7 +30,7 @@ describe Dotfile do
         FileUtils.touch(dotfile_path('.testrc'))
         df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
         Polka.stub(:log)
-        df.setup
+        df.setup { |a, b| FileUtils.cp(a, b) }
         Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .polka_backup_2222-02-02_02:22:22 .testrc)
       end
     end
