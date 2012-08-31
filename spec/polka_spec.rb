@@ -1,18 +1,7 @@
-require_relative "../lib/polka"
-include Polka
+require "spec_helper"
 
-describe "polka" do
-  let(:home_dir) { "home_dir" }
-  let(:dotfile_dir) { "home_dir/.dotfile_dir" }
-
-  before do
-    FileUtils.mkdir(home_dir)
-    FileUtils.mkdir(dotfile_dir)
-  end
-
-  after do
-    FileUtils.rm_rf(home_dir)
-  end
+describe "polka", :integrated_with_files do
+  set_up_testdirs
 
   it "provides a DSL to manage your dotfile setup" do
     setup_dotfiles %w(.onerc .tworc .threerc .nodotfile)
@@ -26,6 +15,7 @@ describe "polka" do
   end
 
   it "backs up existing files in your homedir" do
+    Polka.stub(:log)
     Time.stub(:now) { Time.new(2222, 2, 2, 2, 22, 22) }
     setup_dotfiles %w(.onerc)
     setup_the_dotfile("symlink '.onerc'")

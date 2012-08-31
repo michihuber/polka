@@ -1,23 +1,33 @@
-require_relative "../../lib/polka/dotfile.rb"
+require "spec_helper"
 
 describe Dotfile do
-  describe "#setup" do
+
+  describe "#setup", :integrated_with_files do
+    set_up_testdirs
+
+    def home_path(filename)
+      File.join(home_dir, filename)
+    end
+
+    def dotfile_path(filename)
+      File.join(dotfile_dir, filename)
+    end
+
     it "creates a symlink to itself in the home dir" do
-      df = Dotfile.new("home_dir/.polka/.testrc", "home_dir/.testrc")
-      FileUtils.should_receive(:ln_s).with("home_dir/.polka/.testrc", "home_dir/.testrc")
+      df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
       df.setup
+      Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .testrc)
     end
 
     context "the homedir already contains the file" do
       it "backs up into a backup dir" do
         Time.stub(:now) { Time.new(2222, 2, 2, 2, 22, 22) }
-        df = Dotfile.new("home_dir/.polka/.testrc", "home_dir/.testrc")
-        File.should_receive(:exists?).with("home_dir/.testrc").and_return(true)
-        File.should_receive(:exists?).with("home_dir/.polka_backup_2222-02-02_02:22:22").and_return(false)
-        FileUtils.should_receive(:mkdir).with("home_dir/.polka_backup_2222-02-02_02:22:22")
-        FileUtils.should_receive(:mv).with("home_dir/.testrc", "home_dir/.polka_backup_2222-02-02_02:22:22")
-        FileUtils.should_receive(:ln_s).with("home_dir/.polka/.testrc", "home_dir/.testrc")
+        FileUtils.touch(home_path('.testrc'))
+        FileUtils.touch(dotfile_path('.testrc'))
+        df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
+        Polka.stub(:log)
         df.setup
+        Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .polka_backup_2222-02-02_02:22:22 .testrc)
       end
     end
   end
