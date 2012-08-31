@@ -10,6 +10,7 @@ class Dotfile
   end
 
   def backup
+    Polka.log "Backing up: #{@home_path} => #{backup_dir}"
     FileUtils.mkdir(backup_dir) unless File.exists?(backup_dir)
     FileUtils.mv(@home_path, backup_dir)
   end
