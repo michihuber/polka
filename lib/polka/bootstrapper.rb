@@ -11,7 +11,7 @@ module Polka
     end
 
     def self.from_dotfile(dotfile, home_dir)
-      bootstrapper = new(home_dir, File.dirname(dotfile))
+      bootstrapper = new(home_dir, File.expand_path(File.dirname(dotfile)))
       bootstrapper.instance_eval(dotfile.read)
 
       return bootstrapper
