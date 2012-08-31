@@ -26,18 +26,30 @@ describe Polka::Bootstrapper do
   end
 
   describe "#symlink, #exclude" do
-    it "adds to the symlink group" do
-      hello_dotfile = double(:hello_dotfile)
-      Dotfile.stub(:new) { hello_dotfile }
-      symlink_group.should_receive(:add).with([hello_dotfile])
-      bs.symlink "hello"
+    describe "addings files without options" do
+      let(:hello_dotfile) { double(:hello_dotfile) }
+      before { Dotfile.stub(:new) { hello_dotfile } }
+      it "adds to the symlink group" do
+        symlink_group.should_receive(:add).with([hello_dotfile])
+        bs.symlink "hello"
+      end
+
+      it "adds to the exclude group" do
+        excluded_group.should_receive(:add).with([hello_dotfile])
+        bs.exclude "hello"
+      end
     end
 
-    it "adds to the exclude group" do
-      hello_dotfile = double(:hello_dotfile)
-      Dotfile.stub(:new) { hello_dotfile }
-      excluded_group.should_receive(:add).with([hello_dotfile])
-      bs.exclude "hello"
+    describe ":all other files" do
+      it "adds :all_other_files" do
+        symlink_group.should_receive(:add_all_other_files)
+        bs.symlink :all_other_files
+      end
+
+      it "adds :all_other_files" do
+        excluded_group.should_receive(:add_all_other_files)
+        bs.exclude :all_other_files
+      end
     end
 
     it "adds file with home_dir_path if specified" do
