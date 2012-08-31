@@ -7,6 +7,19 @@ describe Dotfile do
       FileUtils.should_receive(:ln_s).with("home_dir/.polka/.testrc", "home_dir/.testrc")
       df.setup
     end
+
+    context "the homedir already contains the file" do
+      it "backs up into a backup dir" do
+        Time.stub(:now) { Time.new(2222, 2, 2, 2, 22, 22) }
+        df = Dotfile.new("home_dir/.polka/.testrc", "home_dir/.testrc")
+        File.should_receive(:exists?).with("home_dir/.testrc").and_return(true)
+        File.should_receive(:exists?).with("home_dir/.polka_backup_2222-02-02_02:22:22").and_return(false)
+        FileUtils.should_receive(:mkdir).with("home_dir/.polka_backup_2222-02-02_02:22:22")
+        FileUtils.should_receive(:mv).with("home_dir/.testrc", "home_dir/.polka_backup_2222-02-02_02:22:22")
+        FileUtils.should_receive(:ln_s).with("home_dir/.polka/.testrc", "home_dir/.testrc")
+        df.setup
+      end
+    end
   end
 
   describe "equality" do
