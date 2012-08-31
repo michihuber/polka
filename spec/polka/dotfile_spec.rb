@@ -13,7 +13,12 @@ describe Dotfile do
       File.join(dotfile_dir, filename)
     end
 
+    it "raises if dotfile does not exist" do
+      expect { Dotfile.new(dotfile_path('.testrc'), "irrelevant") }.to raise_error(FileNotPresentError)
+    end
+
     it "creates a symlink to itself in the home dir" do
+      FileUtils.touch(dotfile_path('.testrc'))
       df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
       df.setup
       Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .testrc)
@@ -33,6 +38,8 @@ describe Dotfile do
   end
 
   describe "equality" do
+    before { File.stub(:exists?) { true } }
+
     it "regards dotfiles as equal if they share the same dotfile dir path" do
       df1 = Dotfile.new("home/df1", "blah")
       df2 = Dotfile.new("home/df1", "foo")

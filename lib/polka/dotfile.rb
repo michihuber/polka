@@ -1,5 +1,8 @@
+class FileNotPresentError < StandardError; end
+
 class Dotfile
   def initialize(path, home_path)
+    raise FileNotPresentError, "Could not find file at #{path}." unless File.exists?(path)
     @path = path
     @home_path = home_path
   end
