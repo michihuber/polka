@@ -10,7 +10,8 @@ module Polka
 
       @symlink = DotfileGroup.new(symlinking)
       @copy = DotfileGroup.new(copying)
-      @inclusive_groups = [@symlink, @copy]
+      @parsed_copy = DotfileGroup.new(Operations::ParsedCopying)
+      @inclusive_groups = [@symlink, @copy, @parsed_copy]
       @exclude = DotfileGroup.new
       exclude("Dotfile")
     end
@@ -22,10 +23,17 @@ module Polka
       return bootstrapper
     end
 
-    [:symlink, :copy, :exclude].each do |var|
+    [:symlink, :exclude].each do |var|
       define_method(var) do |*files|
         add_files_to_group(files, instance_variable_get("@#{var}"))
       end
+    end
+
+    def copy(*files)
+      cp = files.reject { |fn| fn =~ /\.erb$/ }
+      erb = files - cp
+      add_files_to_group(cp, @copy)
+      add_files_to_group(erb, @parsed_copy)
     end
 
     def setup

@@ -29,11 +29,23 @@ describe "polka", :integrated_with_files do
     Dir.new(File.join(home_dir, ".polka_backup", "2222-02-02_02:22:22")).entries.should == %w(. .. .onerc)
   end
 
-  def setup_dotfiles(files)
-    files.each { |fn| FileUtils.touch(File.join(dotfile_dir, fn)) }
+  it "copys a parsed version of erb files" do
+    setup_the_dotfile("copy '.inforc.erb'")
+    setup_file_with_content("personal.yml", ".inforc:\n  name: peter venkman")
+    setup_file_with_content(".inforc.erb", "hello <%= personal['name'] %>")
+    Cli.new.setup(home_dir, dotfile_dir)
+    File.open(File.join(home_dir, '.inforc')) { |f| f.read }.should == "hello peter venkman"
+  end
+
+  def setup_file_with_content(name, content)
+    File.open(File.join(dotfile_dir, name), "w") { |f| f.write(content) }
   end
 
   def setup_the_dotfile(content)
-    File.open(File.join(dotfile_dir, "Dotfile"), "w") { |f| f.write(content) }
+    setup_file_with_content("Dotfile", content)
+  end
+
+  def setup_dotfiles(files)
+    files.each { |fn| FileUtils.touch(File.join(dotfile_dir, fn)) }
   end
 end

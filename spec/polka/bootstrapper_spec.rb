@@ -1,12 +1,16 @@
 require_relative "../../lib/polka/bootstrapper.rb"
 class Dotfile; end
 class DotfileGroup; end
+module Operations
+  class ParsedCopying; end
+end
 
 describe Polka::Bootstrapper do
   subject(:bs) { Polka::Bootstrapper.new('home', 'home/.polka') }
   let(:copy_group) { double(:copies) }
   let(:symlink_group) { double(:symlinks) }
   let(:excluded_group) { double(:excluded) }
+  let(:parsed_copy_group) { double(:parsed_copy) }
 
   before do
     Dir.stub(:new) { double(entries: %w(. .. blah)) }
@@ -16,13 +20,14 @@ describe Polka::Bootstrapper do
     Dotfile.should_receive(:new).with('home/.polka/Dotfile', 'home/Dotfile').and_return(the_dotfile)
     excluded_group.should_receive(:add).with([the_dotfile])
     DotfileGroup.should_receive(:all_files=).with([blah_dotfile])
-    DotfileGroup.stub(:new).and_return(symlink_group, copy_group, excluded_group)
+    DotfileGroup.stub(:new).and_return(symlink_group, copy_group, parsed_copy_group, excluded_group)
   end
 
   describe "#setup" do
     it "sets up the symlink group" do
       copy_group.should_receive(:setup)
       symlink_group.should_receive(:setup)
+      parsed_copy_group.should_receive(:setup)
       bs.setup
     end
   end
@@ -37,14 +42,21 @@ describe Polka::Bootstrapper do
         bs.symlink "hello"
       end
 
-      it "adds to the copy group" do
-        copy_group.should_receive(:add).with([hello_dotfile])
-        bs.copy "hello"
-      end
-
       it "adds to the exclude group" do
         excluded_group.should_receive(:add).with([hello_dotfile])
         bs.exclude "hello"
+      end
+
+      describe "#copy" do
+        it "adds to the copy group" do
+          copy_group.should_receive(:add).with([hello_dotfile])
+          bs.copy "hello"
+        end
+
+        it "adds to the parsed_copy group if file has erb extension" do
+          parsed_copy_group.should_receive(:add).with([hello_dotfile])
+          bs.copy "hello.erb"
+        end
       end
     end
 
