@@ -1,3 +1,4 @@
+require "thor"
 require_relative "../../lib/polka/cli.rb"
 class Polka::Bootstrapper; end
 

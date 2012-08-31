@@ -1,5 +1,6 @@
 module Polka
-  class Cli
+  class Cli < Thor
+    desc "setup", "sets up your dotfiles according to the instructions in Dotfile"
     def setup(home_dir=nil, dotfile_dir=nil)
       dotfile_path = dotfile_dir ? File.join(dotfile_dir, "Dotfile") : "Dotfile"
       home_path = home_dir || ENV['HOME']
