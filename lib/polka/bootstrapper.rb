@@ -1,11 +1,11 @@
 module Polka
   class Bootstrapper
-    attr :symlinks, :excluded
     def initialize(home_dir, dotfile_dir)
       @home_dir = home_dir
       @dotfile_dir = dotfile_dir
       @symlinks = []
-      @excluded = ["Dotfile"]
+      @excluded = []
+      exclude("Dotfile")
     end
 
     def self.from_dotfile(dotfile, home_dir)
@@ -24,7 +24,7 @@ module Polka
     end
 
     def setup
-      add_all_other_files
+      @symlinks = files_in_dotfile_dir if @symlinks.include?(:all_other_files)
       syms = @symlinks - @excluded
       syms.each { |fn| FileUtils.ln_s(dotfile_path(fn),
                                       home_path(fn)) }
@@ -39,11 +39,8 @@ module Polka
       File.join(@home_dir, filename)
     end
 
-    def add_all_other_files
-      return unless @symlinks.include?(:all_other_files)
-      all_files = Dir.new(@dotfile_dir).entries
-      other_files = all_files - %w(.. .)
-      @symlinks = other_files
+    def files_in_dotfile_dir
+      Dir.new(@dotfile_dir).entries - %w(.. .)
     end
 
     def add_to_group(group, files)
