@@ -14,7 +14,7 @@ class Dotfile
 
   def backup
     Polka.log "Backing up: #{@home_path} => #{backup_dir}"
-    FileUtils.mkdir(backup_dir) unless File.exists?(backup_dir)
+    FileUtils.mkdir_p(backup_dir) unless File.exists?(backup_dir)
     FileUtils.mv(@home_path, backup_dir)
   end
 
@@ -28,7 +28,7 @@ class Dotfile
   alias :eql? equal?
 
   def self.backup_dir(home_path)
-    dir = ".polka_backup_" + Time.now.strftime("%F_%T")
+    dir = File.join(".polka_backup", Time.now.strftime("%F_%T"))
     @@backup_dir ||= File.join(home_path, dir)
   end
 

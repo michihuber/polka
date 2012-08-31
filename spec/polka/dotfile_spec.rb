@@ -31,7 +31,8 @@ describe Dotfile do
         df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
         Polka.stub(:log)
         df.setup { |a, b| FileUtils.cp(a, b) }
-        Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .polka_backup_2222-02-02_02:22:22 .testrc)
+        Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .polka_backup .testrc)
+        Dir.new(File.join(home_dir, '.polka_backup')).entries.should == %w(. .. 2222-02-02_02:22:22)
       end
     end
   end

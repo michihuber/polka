@@ -25,8 +25,8 @@ describe "polka", :integrated_with_files do
     setup_the_dotfile("symlink '.onerc'")
     FileUtils.touch(File.join(home_dir, '.onerc'))
     Cli.new.setup(home_dir, dotfile_dir)
-    Dir.new(File.join(home_dir, ".polka_backup_2222-02-02_02:22:22")).entries.should == %w(. .. .onerc)
-    Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .onerc .polka_backup_2222-02-02_02:22:22)
+    Dir.new(home_dir).entries.should == %w(. .. .dotfile_dir .onerc .polka_backup)
+    Dir.new(File.join(home_dir, ".polka_backup", "2222-02-02_02:22:22")).entries.should == %w(. .. .onerc)
   end
 
   def setup_dotfiles(files)
