@@ -23,6 +23,8 @@ module Polka
       return bootstrapper
     end
 
+    # TODO: the structure of copy and the rest is the same,
+    # refactor into one method?
     [:symlink, :exclude].each do |var|
       define_method(var) do |*files|
         group = instance_variable_get("@#{var}")
@@ -36,13 +38,13 @@ module Polka
     end
 
     def copy(*files)
-      error  = "Cannot copy :all_other_files, please copy files explicitly."
-      raise ArgumentError, error if files.include?(:all_other_files)
-
       if file_with_options?(files)
         group = erb?(files[0]) ? @parsed_copy : @copy
         add_file_with_options_to_group(files, group)
       else
+        error_msg  = "Cannot copy :all_other_files, please copy files explicitly."
+        raise ArgumentError, error_msg if files.include?(:all_other_files)
+
         erb = files.select { |fn| erb?(fn) }
         not_erb = files - erb
         add_files_to_group(erb, @parsed_copy)
@@ -72,7 +74,12 @@ module Polka
     end
 
     def file_with_options?(files)
-      files.size == 2 && files.last.class == Hash && files.last[:as]
+      return false unless files.size == 2 && files.last.class == Hash && files.last[:as]
+      unless files[0] == :all_other_files
+        return true
+      else
+        raise ArgumentError, "Cannot add :all_other_files with :as options"
+      end
     end
 
     def dotfiles_in_dotfile_dir

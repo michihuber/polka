@@ -81,6 +81,10 @@ describe Polka::Bootstrapper do
         excluded_group.should_receive(:add_all_other_files)
         bs.exclude :all_other_files
       end
+
+      it "cannot add :all_other_files with an alias" do
+        expect { bs.symlink(:all_other_files, as: 'something') }.to raise_error(ArgumentError)
+      end
     end
 
     it "adds file with home_dir_path if specified" do
