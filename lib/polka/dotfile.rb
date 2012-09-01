@@ -10,11 +10,11 @@ class Dotfile
   def setup(operation)
     backup if File.exists?(@home_path)
     operation.call(@path, @home_path)
-    Polka.log "#{@path} set up as #{@home_path}"
+    Polka.log "    #{@path} set up as #{@home_path}"
   end
 
   def backup
-    Polka.log "Backing up: #{@home_path} => #{backup_dir}"
+    Polka.log "    Backing up: ".light_yellow + "#{@home_path} => #{backup_dir}"
     FileUtils.mkdir_p(backup_dir) unless File.exists?(backup_dir)
     FileUtils.mv(@home_path, backup_dir)
   end

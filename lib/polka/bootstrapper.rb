@@ -8,9 +8,9 @@ module Polka
       symlinking = lambda { |dest, src| FileUtils.ln_s(dest, src) }
       copying = lambda { |dest, src| FileUtils.cp(dest, src) }
 
-      @symlink = DotfileGroup.new(symlinking)
-      @copy = DotfileGroup.new(copying)
-      @parsed_copy = DotfileGroup.new(Operations::ParsedCopying)
+      @symlink = DotfileGroup.new(symlinking, "  Symlinking files".light_blue)
+      @copy = DotfileGroup.new(copying, "  Copying files".light_blue)
+      @parsed_copy = DotfileGroup.new(Operations::ParsedCopying, "  Parsing and copying files".light_blue)
       @inclusive_groups = [@symlink, @copy, @parsed_copy]
       @exclude = DotfileGroup.new
       exclude("Dotfile")
@@ -53,7 +53,9 @@ module Polka
     end
 
     def setup
+      Polka.log "\nStarting Dotfile Setup with Polka...\n".green
       @inclusive_groups.each(&:setup)
+      Polka.log "\nSetup completed. Enjoy!\n".green
     end
 
     private

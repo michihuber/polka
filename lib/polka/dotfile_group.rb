@@ -16,8 +16,9 @@ class DotfileGroup
     @@all_files - @@grouped_files
   end
 
-  def initialize(operation=nil)
+  def initialize(operation=nil, setup_msg=nil)
     @operation = operation
+    @setup_message = setup_msg
     @files = []
     @all_other_files = false
   end
@@ -43,6 +44,7 @@ class DotfileGroup
   end
 
   def setup
+    Polka.log @setup_message unless files.empty?
     files.each { |f| f.setup(@operation) }
   end
 end

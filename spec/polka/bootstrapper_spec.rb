@@ -1,3 +1,4 @@
+require 'colorize'
 require_relative "../../lib/polka/bootstrapper.rb"
 class Dotfile; end
 class DotfileGroup; end
@@ -25,6 +26,7 @@ describe Polka::Bootstrapper do
 
   describe "#setup" do
     it "sets up the symlink group" do
+      Polka.stub(:log)
       copy_group.should_receive(:setup)
       symlink_group.should_receive(:setup)
       parsed_copy_group.should_receive(:setup)
