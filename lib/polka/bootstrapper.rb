@@ -25,15 +25,29 @@ module Polka
 
     [:symlink, :exclude].each do |var|
       define_method(var) do |*files|
-        add_files_to_group(files, instance_variable_get("@#{var}"))
+        group = instance_variable_get("@#{var}")
+        if file_with_options?(files)
+          add_file_with_options_to_group(files, group)
+        else
+          group.add_all_other_files if files.delete(:all_other_files)
+          add_files_to_group(files, group)
+        end
       end
     end
 
     def copy(*files)
-      cp = files.reject { |fn| fn =~ /\.erb$/ }
-      erb = files - cp
-      add_files_to_group(cp, @copy)
-      add_files_to_group(erb, @parsed_copy)
+      error  = "Cannot copy :all_other_files, please copy files explicitly."
+      raise ArgumentError, error if files.include?(:all_other_files)
+
+      if file_with_options?(files)
+        group = erb?(files[0]) ? @parsed_copy : @copy
+        add_file_with_options_to_group(files, group)
+      else
+        erb = files.select { |fn| erb?(fn) }
+        not_erb = files - erb
+        add_files_to_group(erb, @parsed_copy)
+        add_files_to_group(not_erb, @copy)
+      end
     end
 
     def setup
@@ -42,14 +56,23 @@ module Polka
 
     private
     def add_files_to_group(files, group)
-      dotfiles =  if files.size == 2 && files.last.class == Hash && files.last[:as]
-                    [create_dotfile(files[0], files[1][:as])]
-                  else
-                    group.add_all_other_files if files.delete(:all_other_files)
-                    files.map { |fn| create_dotfile(fn) }
-                  end
-
+      dotfiles = files.map { |fn| create_dotfile(fn) }
       group.add(dotfiles) unless dotfiles.empty?
+    end
+
+    def add_file_with_options_to_group(file_with_options, group)
+      filename = file_with_options[0]
+      homename = file_with_options[1][:as]
+
+      group.add([create_dotfile(filename, homename)])
+    end
+
+    def erb?(filename)
+      filename =~ /\.erb$/
+    end
+
+    def file_with_options?(files)
+      files.size == 2 && files.last.class == Hash && files.last[:as]
     end
 
     def dotfiles_in_dotfile_dir

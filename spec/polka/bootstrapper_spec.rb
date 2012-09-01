@@ -48,6 +48,17 @@ describe Polka::Bootstrapper do
       end
 
       describe "#copy" do
+        it "cannot copy :all_other_files" do
+          expect { bs.copy :all_other_files }.to raise_error(ArgumentError)
+        end
+
+        it "can copy files with aliases" do
+          alias_dotfile = double(:alias_dotfile)
+          Dotfile.should_receive(:new).with("home/.polka/hello", "home/ciao").and_return(alias_dotfile)
+          copy_group.should_receive(:add).with([alias_dotfile])
+          bs.copy("hello", as: "ciao")
+        end
+
         it "adds to the copy group" do
           copy_group.should_receive(:add).with([hello_dotfile])
           bs.copy "hello"
