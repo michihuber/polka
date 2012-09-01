@@ -23,10 +23,9 @@ class Dotfile
     @path.hash
   end
 
-  def equal?(other)
+  def eql?(other)
     hash == other.hash
   end
-  alias :eql? equal?
 
   def self.backup_dir(home_path)
     dir = File.join(".polka_backup", Time.now.strftime("%F_%T"))

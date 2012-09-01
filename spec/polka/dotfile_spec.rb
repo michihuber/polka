@@ -43,7 +43,7 @@ describe Dotfile do
     it "regards dotfiles as equal if they share the same dotfile dir path" do
       df1 = Dotfile.new("home/df1", "blah")
       df2 = Dotfile.new("home/df1", "foo")
-      df1.equal?(df2).should == true
+      df1.eql?(df2).should == true
     end
 
     it "substracts equal dotfiles in array substraction" do
