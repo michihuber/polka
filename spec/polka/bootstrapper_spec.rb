@@ -66,7 +66,8 @@ describe Polka::Bootstrapper do
           bs.copy "hello"
         end
 
-        it "adds to the parsed_copy group if file has erb extension" do
+        it "adds to the parsed_copy group if file has erb extension (without extension on target)" do
+          Dotfile.should_receive(:new).with("home/.polka/hello.erb", "home/hello").and_return(hello_dotfile)
           parsed_copy_group.should_receive(:add).with([hello_dotfile])
           bs.copy "hello.erb"
         end

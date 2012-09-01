@@ -47,8 +47,9 @@ module Polka
 
         erb = files.select { |fn| erb?(fn) }
         not_erb = files - erb
-        add_files_to_group(erb, @parsed_copy)
         add_files_to_group(not_erb, @copy)
+        erb_dotfiles = erb.map { |erbfile| create_dotfile(erbfile, File.basename(erbfile, '.erb')) }
+        @parsed_copy.add(erb_dotfiles) unless erb_dotfiles.empty?
       end
     end
 
