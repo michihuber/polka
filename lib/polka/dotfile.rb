@@ -10,6 +10,7 @@ class Dotfile
   def setup(operation)
     backup if File.exists?(@home_path)
     operation.call(@path, @home_path)
+    Polka.log "#{@path} set up as #{@home_path}"
   end
 
   def backup
