@@ -3,6 +3,8 @@ require "spec_helper"
 describe "polka", :integrated_with_files do
   set_up_testdirs
 
+  before { Polka.stub(:log) }
+
   it "provides a DSL to manage your dotfile setup" do
     setup_dotfiles %w(.onerc .tworc .threerc .nodotfile copyrc)
     setup_the_dotfile <<-EOF
@@ -19,7 +21,6 @@ describe "polka", :integrated_with_files do
   end
 
   it "backs up existing files in your homedir" do
-    Polka.stub(:log)
     Time.stub(:now) { Time.new(2222, 2, 2, 2, 22, 22) }
     setup_dotfiles %w(.onerc)
     setup_the_dotfile("symlink '.onerc'")

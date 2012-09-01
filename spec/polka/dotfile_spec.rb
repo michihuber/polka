@@ -17,6 +17,7 @@ describe Dotfile do
     end
 
     it "yields to a given operation" do
+      Polka.stub(:log)
       FileUtils.touch(dotfile_path('.testrc'))
       df = Dotfile.new(dotfile_path('.testrc'), home_path('.testrc'))
       df.setup(lambda { |dest, src| FileUtils.ln_s(dest, src) })
