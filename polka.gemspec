@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Michi Huber"]
   s.email       = ["michi.huber@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "http://github.com/michihuber/polka"
   s.summary     = ""
   s.description = "Easy Dotfile Management"
 
@@ -17,5 +17,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "thor", ">=0.16.0"
+  s.add_dependency "colorize", "0.5.8"
   s.add_development_dependency 'rspec', '~> 2.11'
 end
