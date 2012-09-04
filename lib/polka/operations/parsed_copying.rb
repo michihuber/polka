@@ -35,7 +35,10 @@ module Polka
 
       def yaml_file
         filename = Polka.config[:personal_file] || File.join(File.dirname(@file), "personal.yml")
-        File.expand_path(filename)
+        filename = File.expand_path(filename)
+        Polka.log("Warning! ".yellow + "Could not find personal file at #{filename}") unless File.exists?(filename)
+
+        filename
       end
 
       def context_name
