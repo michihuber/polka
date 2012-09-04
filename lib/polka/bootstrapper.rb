@@ -59,6 +59,10 @@ module Polka
       Polka.log "\nSetup completed. Enjoy!\n".green
     end
 
+    def configure(config_hash)
+      Polka.config.merge!(config_hash)
+    end
+
     private
     def add_files_to_group(files, group)
       dotfiles = files.map { |fn| create_dotfile(fn) }

@@ -29,16 +29,17 @@ module Polka
         @dest.gsub(/\.erb$/, "")
       end
 
+      def context
+        YAML.load_file(yaml_file)[context_name]
+      end
+
       def yaml_file
-        File.join(File.dirname(@file), 'personal.yml')
+        filename = Polka.config[:personal_file] || File.join(File.dirname(@file), "personal.yml")
+        File.expand_path(filename)
       end
 
       def context_name
         File.basename(@file, ".erb")
-      end
-
-      def context
-        YAML.load_file(yaml_file)[context_name]
       end
 
       def erb

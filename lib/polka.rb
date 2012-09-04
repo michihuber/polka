@@ -11,6 +11,14 @@ require_relative "polka/dotfile_group"
 require_relative "polka/operations/parsed_copying"
 
 module Polka
+  def self.config
+    @config ||= {}
+  end
+
+  def self.config=(hash)
+    @config = hash
+  end
+
   def self.log(msg)
     puts msg
   end

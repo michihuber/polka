@@ -34,6 +34,14 @@ describe Polka::Bootstrapper do
     end
   end
 
+  describe "#configure" do
+    it "merges the given hash into the config-hash" do
+      config_hash = double(merge!: true)
+      Polka.should_receive(:config).and_return(config_hash)
+      bs.configure personal_file: "~/Dripbox/private.yml"
+    end
+  end
+
   describe "#symlink, #exclude, #copy" do
     describe "addings files without options" do
       let(:hello_dotfile) { double(:hello_dotfile) }
