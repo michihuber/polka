@@ -6,6 +6,8 @@ Polka sets up your dotfiles
 
 In your dotfile directory create a file called `Dotfile`. My Dotfile looks like this:
 
+    configure personal_file: "~/Dropbox/polka_personal.yml"
+
     symlink ".gemrc", ".vimrc", ".zshrc", ".zsh_custom", ".vim"
     symlink ".gitignore_global", as: ".gitignore"
     copy ".gitconfig.erb"
@@ -26,5 +28,4 @@ In `.gitconfig.erb`:
       name = <%= personal['name'] %>
       email = <%= personal['email'] %>
 
-`personal.yml` should be added to your `.gitignore`, ldo.
-
+`personal.yml` is expected to be in your dotfile directory and should be added to your `.gitignore`, ldo. Alternatively, you can configure an alternate path (see example).
