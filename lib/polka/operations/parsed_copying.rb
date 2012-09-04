@@ -30,7 +30,12 @@ module Polka
       end
 
       def context
-        YAML.load_file(yaml_file)[context_name]
+        context = Hash.new do |_, k|
+          Polka.log "    Please provide personal['#{k}'] for #{context_name}: ";
+          Kernel.gets.chomp
+        end
+        yaml_hash = YAML.load_file(yaml_file)[context_name] if File.exists?(yaml_file)
+        context.merge(yaml_hash)
       end
 
       def yaml_file
