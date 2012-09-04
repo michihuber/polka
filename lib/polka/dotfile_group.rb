@@ -44,7 +44,7 @@ class DotfileGroup
   end
 
   def setup
-    Polka.log @setup_message unless files.empty?
+    Polka.log @setup_message.light_blue unless files.empty?
     files.each { |f| f.setup(@operation) }
   end
 end
