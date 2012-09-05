@@ -20,6 +20,12 @@ module Polka
   end
 
   def self.log(msg)
-    puts msg
+    $stdout.puts msg
+  end
+
+  def self.ask(question)
+    $stdout.print question
+    $stdout.flush
+    $stdin.gets.chomp
   end
 end

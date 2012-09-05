@@ -9,7 +9,6 @@ describe Polka::Operations::ParsedCopying, :integrated_with_files do
 
   before do
     File.open(input_file, "w") { |f| f.write("hello <%= personal['name'] %>") }
-    Polka.stub(:puts)
   end
 
   def write_personal_file(filename)
@@ -31,7 +30,7 @@ describe Polka::Operations::ParsedCopying, :integrated_with_files do
     write_personal_file(personal_file)
 
     File.open(input_file, "w") { |f| f.write("hello <%= personal['not_name'] %>") }
-    Kernel.stub(:gets) { "johnny\n" }
+    Polka.stub(:ask) { "johnny" }
     copier.call(input_file, output_file)
     parsed_content.should == "hello johnny"
   end
@@ -46,5 +45,12 @@ describe Polka::Operations::ParsedCopying, :integrated_with_files do
 
     copier.call(input_file, output_file)
     parsed_content.should == "hello ray stanz"
+  end
+
+  it "doesn't produce errors if personal file is missing" do
+    Polka.stub(:config) { { personal_file: "does_not_exist" } }
+    Polka.stub(:ask) { "what" }
+    Polka.stub(:log)
+    expect { copier.call(input_file, output_file) }.to_not raise_error
   end
 end
