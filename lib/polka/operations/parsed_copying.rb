@@ -31,6 +31,7 @@ module Polka
 
       def context
         context = Hash.new do |_, k|
+          Polka.log "    Warning: ".yellow + "personal['#{k}'] not found for #{context_name} in #{yaml_file}."
           Polka.ask "    Please provide personal['#{k}'] for #{context_name}: "
         end
 
